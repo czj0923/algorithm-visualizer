@@ -1,26 +1,34 @@
 <template>
-  <n-layout has-sider>
-    <n-layout-sider
-      collapse-mode="width"
-      :collapsed-width="13"
-      :width="240"
-      show-trigger="arrow-circle"
-      bordered
-    >
-      <n-menu :options="menuOptions" />
-    </n-layout-sider>
-    <n-layout-content content-style="padding: 24px;">
-      <AStar />
-    </n-layout-content>
+  <n-layout>
+    <n-layout-header bordered> Header </n-layout-header>
+    <n-layout has-sider>
+      <n-layout-sider
+        collapse-mode="width"
+        :collapsed-width="13"
+        :width="240"
+        show-trigger="arrow-circle"
+        bordered
+      >
+        <n-menu :options="menuOptions" />
+      </n-layout-sider>
+      <n-layout-content content-style="padding: 24px;">
+        <router-view />
+      </n-layout-content>
+    </n-layout>
   </n-layout>
 </template>
 
 <script lang="ts" setup>
 import { h } from "vue";
-import { NMenu, NLayout, NLayoutSider, NLayoutContent } from "naive-ui";
+import {
+  NMenu,
+  NLayout,
+  NLayoutSider,
+  NLayoutContent,
+  NLayoutHeader,
+} from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { RouterLink } from "vue-router";
-import AStar from "@/views/AStar.vue";
 
 const menuOptions: MenuOption[] = [
   {
@@ -29,26 +37,44 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "astar",
+            path: "/",
           },
         },
-        { default: () => "A Star" }
+        { default: () => "home" }
       ),
     key: "astar",
   },
   {
     label: () =>
       h(
-        "a",
+        RouterLink,
         {
-          href: "",
-          rel: "noopenner noreferrer",
+          to: {
+            path: "/astar",
+          },
         },
-        "排序算法"
+        { default: () => "A Star" }
       ),
-    key: "hear-the-wind-sing",
+    key: "2",
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            path: "/echarts",
+          },
+        },
+        { default: () => "echarts" }
+      ),
+    key: "3",
   },
 ];
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.n-layout {
+  min-height: 100vh;
+}
+</style>

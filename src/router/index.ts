@@ -3,10 +3,6 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/home",
-  },
-  {
-    path: "/home",
     name: "home",
     component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
   },
@@ -15,6 +11,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "astar",
     component: () =>
       import(/* webpackChunkName: "astar" */ "../views/AStar.vue"),
+  },
+  {
+    path: "/echarts",
+    name: "echarts",
+    component: () =>
+      import(/* webpackChunkName: "EchartsTest" */ "../views/EchartsTest.vue"),
   },
 ];
 

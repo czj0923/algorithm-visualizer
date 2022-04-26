@@ -1,9 +1,9 @@
 <template>
-  <MainLayout />
+  <Layout />
 </template>
 
 <script lang="ts" setup>
-import MainLayout from "@/components/Layout.vue";
+import Layout from "@/components/Layout.vue";
 </script>
 
 <style lang="scss">

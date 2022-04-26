@@ -22,16 +22,20 @@ import { initData } from "@/types/AStar";
 import { NButton, NSpace } from "naive-ui";
 
 const state = reactive(new initData());
-for (let i = 0; i < state.rowCount; i++) {
-  state.mapArr[i] = [];
-  for (let j = 0; j < state.colCount; j++) {
-    state.mapArr[i][j] = "1";
+
+//重置map
+function resetMap() {
+  for (let i = 0; i < state.rowCount; i++) {
+    state.mapArr[i] = [];
+    for (let j = 0; j < state.colCount; j++) {
+      state.mapArr[i][j] = "1";
+    }
   }
 }
-
+resetMap();
 const generate = () => {
-  //先清空map
-  state.mapArr = [[]];
+  //先重置map
+  resetMap();
   for (let i = 0; i < state.obstacleCount; i++) {
     let x = Math.round(Math.random() * (state.rowCount - 1));
     let y = Math.round(Math.random() * (state.colCount - 1));
