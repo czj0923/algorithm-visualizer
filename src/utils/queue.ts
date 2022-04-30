@@ -1,13 +1,13 @@
 export class Queue {
-  items: number[] = [];
+  items: Array<Array<number>> = [];
   //入队
-  enqueue(element: number) {
+  enqueue(element: number[]) {
     this.items.push(element);
   }
   //出队
   dequeue() {
     const result = this.items.shift();
-    return typeof result != "undefined" ? result : false;
+    return result;
   }
   //返回队首元素
   front() {
