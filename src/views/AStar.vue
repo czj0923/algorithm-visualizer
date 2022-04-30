@@ -13,11 +13,11 @@
         :class="{ obstacle: block === '2' }"
         :style="{
           width: 600 / state.colCount + 'px',
+          backgroundColor: state.roadArr[index1][index2] ? 'red' : '',
         }"
         v-for="(block, index2) in row"
         :key="index2"
       >
-        <!-- {{ state.hasSearchArr[index1][index2] ? "1" : "0" }} -->
         {{ block === "99" ? "〇" : block === "100" ? "☆" : "" }}
       </div>
     </div>
@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { reactive, onMounted } from "vue";
-import { initData } from "@/types/AStar";
+import { initData, nodeType } from "@/types/AStar";
 import { NButton, NSpace } from "naive-ui";
 import { Stack } from "@/utils/stack";
 import { Queue } from "@/utils/queue";
@@ -38,20 +38,25 @@ const state = reactive(new initData());
 
 //利用队列来实现bfs
 const queue = new Queue();
+//存放路径  将二维数组地图映射成为一维数组 对应一维数组下标:colCount*x+y
+const comeRoute = new Array(state.rowCount * state.colCount);
 
 //重置map 和hasSearchArr
 function resetMap(): void {
   for (let i = 0; i < state.rowCount; i++) {
     state.mapArr[i] = [];
     state.hasSearchArr[i] = [];
+    state.roadArr[i] = [];
     for (let j = 0; j < state.colCount; j++) {
       state.mapArr[i][j] = "1";
       state.hasSearchArr[i][j] = false;
+      state.roadArr[i][j] = false;
     }
   }
 }
+
 //生成随机坐标
-function getRandom(): [number, number] {
+function getRandom(): nodeType {
   return [
     Math.round(Math.random() * (state.rowCount - 1)),
     Math.round(Math.random() * (state.colCount - 1)),
@@ -59,8 +64,8 @@ function getRandom(): [number, number] {
 }
 
 //可以前往的坐标
-function getInnerPos(x: number, y: number): Array<Array<number>> {
-  let aroundPos = [
+function getInnerPos(x: number, y: number): nodeType[] {
+  let aroundPos: Array<nodeType> = [
     [x, y - 1],
     [x + 1, y],
     [x, y + 1],
@@ -117,6 +122,7 @@ onMounted(() => {
   //开始时把入口放入队列并标记为已访问
   queue.enqueue(state.entrance);
   state.hasSearchArr[state.entrance[0]][state.entrance[1]] = true;
+  comeRoute[state.entrance[0] * state.colCount + state.entrance[1]] = null;
   //当队列不为空时
   //let timer = setInterval(() => {
   //  if (!queue.isEmpty()) {
@@ -142,10 +148,11 @@ onMounted(() => {
   let start_time = new Date().getTime();
 
   while (!queue.isEmpty()) {
-    const temp = queue.dequeue() as [number, number];
+    const temp = queue.dequeue() as nodeType;
 
     //如果该点是终点 则结束
     if (temp[0] == state.export[0] && temp[1] == state.export[1]) {
+      console.log("找到终点了");
       break;
     }
 
@@ -157,9 +164,23 @@ onMounted(() => {
       //标记为已查询过
       state.hasSearchArr[item[0]][item[1]] = true;
       queue.enqueue(item);
+      comeRoute[item[0] * state.colCount + item[1]] = [temp[0], temp[1]];
     });
   }
   let end_time = new Date().getTime();
+
+  //从终点开始往回找路径并保存
+
+  let [x, y] = state.export;
+  state.roadArr[x][y] = true;
+
+  while (comeRoute[x * state.colCount + y]) {
+    let cur_node = comeRoute[x * state.colCount + y];
+    x = cur_node[0];
+    y = cur_node[1];
+    state.roadArr[x][y] = true;
+  }
+  console.log(comeRoute);
 
   console.log("运行时间：", end_time - start_time, "ms");
 });
