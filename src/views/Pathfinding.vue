@@ -61,8 +61,8 @@
                     />
                   </n-form-item>
                   <n-form-item>
-                    <n-button type="primary" @click="generate">
-                      重新生成
+                    <n-button type="primary" @click="reGenerateMap">
+                      重新生成地图
                     </n-button>
                   </n-form-item>
                 </n-form>
@@ -106,13 +106,12 @@
 
 <script lang="ts" setup>
 import { reactive, onMounted, ref } from "vue";
-import { initData, nodeType } from "@/types/AStar";
+import { initData, posType, blockType } from "@/types/PathFinding";
 import {
   NButton,
   FormInst,
   NForm,
   NFormItem,
-  NInput,
   NInputNumber,
   NRadioGroup,
   NSpace,
@@ -152,36 +151,24 @@ const mapData = reactive({
   obstacleNum: 20,
 });
 
-//利用队列来实现bfs
-const queue = new Queue();
-//存放路径  将二维数组地图映射成为一维数组 对应一维数组下标:colCount*x+y
-const comeRoute = new Array(state.rowCount * state.colCount);
-
-//重置map 和hasSearchArr
-function resetMap(): void {
-  for (let i = 0; i < state.rowCount; i++) {
-    state.mapArr[i] = [];
-    state.hasSearchArr[i] = [];
-    state.roadArr[i] = [];
-    for (let j = 0; j < state.colCount; j++) {
-      state.mapArr[i][j] = "1";
-      state.hasSearchArr[i][j] = false;
-      state.roadArr[i][j] = false;
-    }
-  }
-}
-
 //生成随机坐标
-function getRandom(): nodeType {
+function getRandom(rowCount: number, colCount: number): posType {
   return [
-    Math.round(Math.random() * (state.rowCount - 1)),
-    Math.round(Math.random() * (state.colCount - 1)),
+    Math.round(Math.random() * (rowCount - 1)),
+    Math.round(Math.random() * (colCount - 1)),
   ];
 }
 
-//可以前往的坐标
-function getInnerPos(x: number, y: number): nodeType[] {
-  let aroundPos: Array<nodeType> = [
+//获取可以前往的坐标
+function getInnerPos(
+  mapArr: Array<Array<blockType>>,
+  x: number,
+  y: number,
+  rowCount: number,
+  colCount: number,
+  hasSearchArr: Array<Array<boolean>>
+): posType[] {
+  let aroundPos: Array<posType> = [
     [x, y - 1],
     [x + 1, y],
     [x, y + 1],
@@ -190,105 +177,188 @@ function getInnerPos(x: number, y: number): nodeType[] {
   return aroundPos.filter((arr) => {
     return (
       arr[0] >= 0 &&
-      arr[0] < state.rowCount &&
+      arr[0] < rowCount &&
       arr[1] >= 0 &&
-      arr[1] < state.colCount &&
-      state.mapArr[arr[0]][arr[1]] !== "2" &&
-      !state.hasSearchArr[arr[0]][arr[1]]
+      arr[1] < colCount &&
+      mapArr[arr[0]][arr[1]] !== "2" &&
+      !hasSearchArr[arr[0]][arr[1]]
     );
   });
 }
 
-const generate = () => {
-  //先重置map
-  resetMap();
-  //生成障碍物
-  for (let i = 0; i < state.obstacleCount; i++) {
-    let [x, y] = getRandom();
-    while (state.mapArr[x][y] === "2") {
-      [x, y] = getRandom();
-    }
-
-    state.mapArr[x][y] = "2";
-  }
-  //生成入口
-  for (let i = 0; i < state.colCount; i++) {
-    //不是障碍物就设置为入口
-    if (!(state.mapArr[0][i] == "2")) {
-      state.mapArr[0][i] = "99";
-      state.entrance = [0, i];
-      break;
-    }
-  }
-  //生成出口
-  for (let i = state.colCount - 1; i >= 0; i--) {
-    //不是障碍物就设置为出口
-    if (!(state.mapArr[state.rowCount - 1][i] == "2")) {
-      state.mapArr[state.rowCount - 1][i] = "100";
-      state.export = [state.rowCount - 1, i];
-      break;
-    }
-  }
-};
-
-onMounted(() => {
-  //生成障碍物
-  generate();
-
+//广度优先搜索
+const bfs: (
+  mapArr: Array<Array<blockType>>,
+  entrance: posType,
+  exit: posType,
+  rowCount: number,
+  colCount: number
+) => { hasRoad: boolean; comeRoute: posType[] } = (
+  mapArr,
+  entrance,
+  exit,
+  rowCount,
+  colCount
+) => {
+  //利用队列来实现bfs
+  const queue = new Queue();
   //开始时把入口放入队列并标记为已访问
-  queue.enqueue(state.entrance);
-  state.hasSearchArr[state.entrance[0]][state.entrance[1]] = true;
-  comeRoute[state.entrance[0] * state.colCount + state.entrance[1]] = null;
-  //当队列不为空时
-  //let timer = setInterval(() => {
-  //  if (!queue.isEmpty()) {
-  //    const temp = queue.dequeue() as [number, number];
-  //
-  //    //如果该点是终点 则结束
-  //    if (temp[0] == state.export[0] && temp[1] == state.export[1]) {
-  //      //break;
-  //      clearInterval(timer);
-  //    }
-  //
-  //    //查找可以前往的点,并入队
-  //    const pos = getInnerPos(temp[0], temp[1]);
-  //    console.log(pos);
-  //
-  //    pos.forEach((item) => {
-  //      //标记为已查询过
-  //      state.hasSearchArr[item[0]][item[1]] = true;
-  //      queue.enqueue(item);
-  //    });
-  //  }
-  //}, 100);
-  let start_time = new Date().getTime();
-  //标记是否有通路
+  queue.enqueue(entrance);
+
+  //存放路径  将二维数组地图映射成为一维数组 对应一维数组下标:colCount*x+y
+  const comeRoute = new Array(state.rowCount * state.colCount);
+  //初始化已搜索过的节点
+  let hasSearchArr: Array<Array<boolean>> = [];
+  for (let i = 0; i < rowCount; i++) {
+    hasSearchArr[i] = [];
+    for (let j = 0; j < colCount; j++) {
+      hasSearchArr[i][j] = false;
+    }
+  }
+  hasSearchArr[entrance[0]][entrance[1]] = true;
+
+  //标记是否有道路
   let hasRoad = false;
 
-  while (!queue.isEmpty()) {
-    const temp = queue.dequeue() as nodeType;
+  comeRoute[entrance[0] * colCount + entrance[1]] = null;
 
+  while (!queue.isEmpty()) {
+    const temp = queue.dequeue() as posType;
     //如果该点是终点 则结束
-    if (temp[0] == state.export[0] && temp[1] == state.export[1]) {
+    if (temp[0] == exit[0] && temp[1] == exit[1]) {
+      //标记是否有通路
       hasRoad = true;
       break;
     }
 
     //查找可以前往的点,并入队
-    const pos = getInnerPos(temp[0], temp[1]);
-    //console.log(pos);
+    const pos = getInnerPos(
+      mapArr,
+      temp[0],
+      temp[1],
+      rowCount,
+      colCount,
+      hasSearchArr
+    );
 
     pos.forEach((item) => {
       //标记为已查询过
-      state.hasSearchArr[item[0]][item[1]] = true;
+      hasSearchArr[item[0]][item[1]] = true;
       queue.enqueue(item);
-      comeRoute[item[0] * state.colCount + item[1]] = [temp[0], temp[1]];
+      comeRoute[item[0] * colCount + item[1]] = [temp[0], temp[1]];
     });
   }
+  return {
+    hasRoad,
+    comeRoute,
+  };
+};
+
+//生成地图
+const generateMap = (
+  rowCount: number,
+  colCount: number,
+  obstacleNum: number
+): {
+  mapArr: Array<Array<blockType>>;
+  roadArr: Array<Array<boolean>>;
+  entrance: posType;
+  exit: posType;
+} => {
+  //先重置map
+  let mapArr: Array<Array<blockType>> = [];
+  let roadArr: Array<Array<boolean>> = [];
+  let entrance: posType = [0, 0];
+  let exit: posType = [0, 0];
+
+  for (let i = 0; i < rowCount; i++) {
+    mapArr[i] = [];
+    roadArr[i] = [];
+    for (let j = 0; j < colCount; j++) {
+      mapArr[i][j] = "1";
+      roadArr[i][j] = false;
+    }
+  }
+  console.log(mapArr);
+
+  //生成障碍物
+  for (let i = 0; i < obstacleNum; i++) {
+    let [x, y] = getRandom(rowCount, colCount);
+    while (mapArr[x][y] === "2") {
+      [x, y] = getRandom(rowCount, colCount);
+    }
+
+    mapArr[x][y] = "2";
+  }
+  //生成入口
+  for (let i = 0; i < colCount; i++) {
+    //不是障碍物就设置为入口
+    if (!(mapArr[0][i] == "2")) {
+      mapArr[0][i] = "99";
+      entrance = [0, i];
+      break;
+    }
+  }
+  //生成出口
+  for (let i = colCount - 1; i >= 0; i--) {
+    //不是障碍物就设置为出口
+    if (!(mapArr[rowCount - 1][i] == "2")) {
+      mapArr[rowCount - 1][i] = "100";
+      exit = [rowCount - 1, i];
+      break;
+    }
+  }
+
+  return {
+    mapArr,
+    roadArr,
+    entrance,
+    exit,
+  };
+};
+
+//重新生成
+const reGenerateMap = () => {
+  const { mapArr, roadArr, entrance, exit } = generateMap(
+    mapData.rowCount,
+    mapData.colCount,
+    mapData.obstacleNum
+  );
+  state.rowCount = mapData.rowCount;
+  state.colCount = mapData.colCount;
+  state.obstacleNum = mapData.obstacleNum;
+  state.mapArr = mapArr;
+  state.roadArr = roadArr;
+  state.entrance = entrance;
+  state.exit = exit;
+};
+
+onMounted(() => {
+  //生成障碍物和出入口
+  const { mapArr, roadArr, entrance, exit } = generateMap(
+    state.rowCount,
+    state.colCount,
+    state.obstacleNum
+  );
+  state.mapArr = mapArr;
+  state.roadArr = roadArr;
+  state.entrance = entrance;
+  state.exit = exit;
+
+  let start_time = new Date().getTime();
+  let { hasRoad, comeRoute } = bfs(
+    state.mapArr,
+    state.entrance,
+    state.exit,
+    state.rowCount,
+    state.colCount
+  );
+  let end_time = new Date().getTime();
+  const spend_time = end_time - start_time;
 
   //从终点开始往回找路径并保存
 
-  let [x, y] = state.export;
+  let [x, y] = state.exit;
   state.roadArr[x][y] = true;
 
   while (comeRoute[x * state.colCount + y]) {
@@ -297,8 +367,6 @@ onMounted(() => {
     y = cur_node[1];
     state.roadArr[x][y] = true;
   }
-  let end_time = new Date().getTime();
-  const spend_time = end_time - start_time;
 
   if (hasRoad) {
     window.$message.success("找到终点了! 用时:" + spend_time + "ms");
