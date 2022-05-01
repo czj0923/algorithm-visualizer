@@ -1,6 +1,11 @@
 <template>
-  <n-layout>
-    <n-layout-header bordered> Header </n-layout-header>
+  <n-layout class="main-layout">
+    <n-layout-header bordered class="nav">
+      顶部栏
+      <n-button quaternary type="success" @click="changeTheme">
+        {{ store.theme ? "浅色" : "深色" }}
+      </n-button></n-layout-header
+    >
     <n-layout has-sider>
       <n-layout-sider
         collapse-mode="width"
@@ -26,9 +31,18 @@ import {
   NLayoutSider,
   NLayoutContent,
   NLayoutHeader,
+  NButton,
+  darkTheme,
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
 import { RouterLink } from "vue-router";
+import { useMainStore } from "@/store/main";
+
+const store = useMainStore();
+
+const changeTheme = () => {
+  store.theme = store.theme ? null : darkTheme;
+};
 
 const menuOptions: MenuOption[] = [
   {
@@ -50,10 +64,10 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            path: "/astar",
+            path: "/pathfinding",
           },
         },
-        { default: () => "A Star" }
+        { default: () => "Pathfinding" }
       ),
     key: "2",
   },
@@ -74,7 +88,13 @@ const menuOptions: MenuOption[] = [
 </script>
 
 <style scoped lang="scss">
-.n-layout {
+.main-layout {
   min-height: 100vh;
+  .nav {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 </style>

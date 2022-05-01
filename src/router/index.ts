@@ -7,10 +7,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "home" */ "../views/Home.vue"),
   },
   {
-    path: "/astar",
-    name: "astar",
+    path: "/pathfinding",
+    name: "pathfinding",
     component: () =>
-      import(/* webpackChunkName: "astar" */ "../views/AStar.vue"),
+      import(/* webpackChunkName: "pathfinding" */ "../views/Pathfinding.vue"),
   },
   {
     path: "/echarts",

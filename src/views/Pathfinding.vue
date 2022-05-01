@@ -13,7 +13,7 @@
         :class="{ obstacle: block === '2' }"
         :style="{
           width: 600 / state.colCount + 'px',
-          backgroundColor: state.roadArr[index1][index2] ? 'red' : '',
+          backgroundColor: state.roadArr[index1][index2] ? '#0f0' : '',
         }"
         v-for="(block, index2) in row"
         :key="index2"
@@ -146,13 +146,15 @@ onMounted(() => {
   //  }
   //}, 100);
   let start_time = new Date().getTime();
+  //标记是否有通路
+  let hasRoad = false;
 
   while (!queue.isEmpty()) {
     const temp = queue.dequeue() as nodeType;
 
     //如果该点是终点 则结束
     if (temp[0] == state.export[0] && temp[1] == state.export[1]) {
-      console.log("找到终点了");
+      hasRoad = true;
       break;
     }
 
@@ -167,7 +169,6 @@ onMounted(() => {
       comeRoute[item[0] * state.colCount + item[1]] = [temp[0], temp[1]];
     });
   }
-  let end_time = new Date().getTime();
 
   //从终点开始往回找路径并保存
 
@@ -180,9 +181,14 @@ onMounted(() => {
     y = cur_node[1];
     state.roadArr[x][y] = true;
   }
-  console.log(comeRoute);
+  let end_time = new Date().getTime();
+  const spend_time = end_time - start_time;
 
-  console.log("运行时间：", end_time - start_time, "ms");
+  if (hasRoad) {
+    window.$message.success("找到终点了! 用时:" + spend_time + "ms");
+  } else {
+    window.$message.error("没有找到路~");
+  }
 });
 </script>
 
@@ -197,13 +203,13 @@ onMounted(() => {
   }
 }
 .block {
-  border: 1px solid #999;
+  //border: 1px solid #999;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 18px;
   &.obstacle {
-    background-color: #000;
+    background-color: rgb(154, 154, 154);
     color: #fff;
   }
 }
