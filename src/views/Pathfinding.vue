@@ -1,40 +1,156 @@
 <template>
-  <div class="map">
-    <div
-      class="row"
-      :style="{
-        height: 600 / state.rowCount + 'px',
-      }"
-      v-for="(row, index1) in state.mapArr"
-      :key="index1"
-    >
-      <div
-        class="block"
-        :class="{ obstacle: block === '2' }"
-        :style="{
-          width: 600 / state.colCount + 'px',
-          backgroundColor: state.roadArr[index1][index2] ? '#0f0' : '',
-        }"
-        v-for="(block, index2) in row"
-        :key="index2"
-      >
-        {{ block === "99" ? "〇" : block === "100" ? "☆" : "" }}
-      </div>
-    </div>
+  <div class="path-finding">
+    <n-grid x-gap="12" cols="xs:1 l:2" responsive="screen">
+      <n-gi>
+        <div class="map">
+          <div
+            class="row"
+            :style="{
+              height: 600 / state.rowCount + 'px',
+            }"
+            v-for="(row, index1) in state.mapArr"
+            :key="index1"
+          >
+            <div
+              class="block"
+              :class="{ obstacle: block === '2' }"
+              :style="{
+                width: 600 / state.colCount + 'px',
+                backgroundColor: state.roadArr[index1][index2] ? '#0f0' : '',
+              }"
+              v-for="(block, index2) in row"
+              :key="index2"
+            >
+              {{ block === "99" ? "〇" : block === "100" ? "☆" : "" }}
+            </div>
+          </div>
+        </div>
+      </n-gi>
+      <n-gi>
+        <div class="set-panel">
+          <n-grid x-gap="12" :cols="2">
+            <n-gi>
+              <n-card title="地图">
+                <n-form
+                  ref="mapFormRef"
+                  :label-width="80"
+                  :model="mapData"
+                  label-placement="left"
+                  size="small"
+                  ><n-form-item label="行数" path="rowCount">
+                    <n-input-number
+                      v-model:value="mapData.rowCount"
+                      placeholder="最大值"
+                      :min="10"
+                      :max="200"
+                    />
+                  </n-form-item>
+                  <n-form-item label="列数" path="colCount">
+                    <n-input-number
+                      v-model:value="mapData.colCount"
+                      placeholder="最大值"
+                      :min="10"
+                      :max="200"
+                    /> </n-form-item
+                  ><n-form-item label="障碍物数" path="obstacleNum">
+                    <n-input-number
+                      v-model:value="mapData.obstacleNum"
+                      placeholder="最大值"
+                      :min="10"
+                      :max="2000"
+                    />
+                  </n-form-item>
+                  <n-form-item>
+                    <n-button type="primary" @click="generate">
+                      重新生成
+                    </n-button>
+                  </n-form-item>
+                </n-form>
+              </n-card>
+            </n-gi>
+            <n-gi>
+              <n-card title="设置">
+                <n-form
+                  ref="formRef"
+                  :label-width="80"
+                  :model="setData"
+                  label-placement="left"
+                  size="small"
+                >
+                  <n-form-item label="使用算法" path="algorithmType">
+                    <n-radio-group
+                      v-model:value="setData.algorithmType"
+                      name="radiogroup"
+                    >
+                      <n-space>
+                        <n-radio
+                          v-for="item in setData.typeArr"
+                          :key="item.key"
+                          :value="item.key"
+                          :disabled="item.key == 'astar'"
+                        >
+                          {{ item.name }}
+                        </n-radio>
+                      </n-space>
+                    </n-radio-group>
+                  </n-form-item>
+                </n-form>
+              </n-card>
+            </n-gi>
+          </n-grid>
+        </div>
+      </n-gi>
+    </n-grid>
   </div>
-  <n-space>
-    <n-button type="primary" @click="generate"> 重新生成 </n-button>
-  </n-space>
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, ref } from "vue";
 import { initData, nodeType } from "@/types/AStar";
-import { NButton, NSpace } from "naive-ui";
+import {
+  NButton,
+  FormInst,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputNumber,
+  NRadioGroup,
+  NSpace,
+  NRadio,
+  NCard,
+  NGrid,
+  NGi,
+} from "naive-ui";
 import { Stack } from "@/utils/stack";
 import { Queue } from "@/utils/queue";
 
 const state = reactive(new initData());
+
+const formRef = ref<FormInst | null>(null);
+const setData = reactive({
+  name: "",
+  typeArr: [
+    {
+      name: "广度优先(BFS)",
+      key: "bfs",
+    },
+    {
+      name: "深度优先(DFS)",
+      key: "dfs",
+    },
+    {
+      name: "A*",
+      key: "astar",
+    },
+  ],
+  algorithmType: "bfs",
+});
+
+const mapData = reactive({
+  rowCount: 20,
+  colCount: 20,
+  obstacleNum: 20,
+});
 
 //利用队列来实现bfs
 const queue = new Queue();
@@ -193,24 +309,30 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.path-finding {
+  display: flex;
+}
 .map {
   width: 600px;
   height: 600px;
   max-height: 100%;
-  margin: 0 auto;
+  margin-right: 20px;
   .row {
     display: flex;
   }
 }
 .block {
-  //border: 1px solid #999;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 18px;
+  background-color: #fff;
   &.obstacle {
     background-color: rgb(154, 154, 154);
     color: #fff;
   }
+}
+.set-panel {
+  flex: 1;
 }
 </style>
