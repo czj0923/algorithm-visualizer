@@ -1,13 +1,34 @@
 <template>
   <div>
     <div id="main" style="width: 600px; height: 400px"></div>
+    <div v-for="(item, index1) in state.arr" :key="index1">
+      --------------
+      <div v-for="(item2, index2) in item" :key="index2">{{ item2 }}</div>
+    </div>
+    <n-button @click="test">测试</n-button>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, reactive } from "vue";
 import * as echarts from "echarts";
-import { NSpin } from "naive-ui";
+import { NSpin, NButton } from "naive-ui";
+
+const state: {
+  arr: Array<Array<string>>;
+} = reactive({
+  arr: [],
+});
+for (let i = 0; i < 10; i++) {
+  state.arr[i] = [];
+  for (let j = 0; j < 10; j++) {
+    state.arr[i][j] = "1";
+  }
+}
+
+const test = () => {
+  state.arr[5][5] = "reuteuritei";
+};
 onMounted(() => {
   var myChart = echarts.init(document.getElementById("main") as HTMLElement);
 

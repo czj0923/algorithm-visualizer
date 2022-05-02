@@ -28,10 +28,16 @@
         </div>
       </n-gi>
       <n-gi>
-        <n-statistic label="搜索时间">
-          {{ statisticalData.spendTime }}
-          <template #suffix> ms </template>
-        </n-statistic>
+        <n-card title="统计信息">
+          <n-statistic label="搜索时间">
+            {{ statisticalData.spendTime }}
+            <template #suffix> ms </template>
+          </n-statistic>
+          <n-statistic label="单位距离">
+            {{ statisticalData.distance }}
+            <template #suffix> 单位 </template>
+          </n-statistic>
+        </n-card>
         <div class="set-panel">
           <n-grid x-gap="12" :cols="2">
             <n-gi>
@@ -62,7 +68,7 @@
                       v-model:value="mapData.obstacleNum"
                       placeholder="最大值"
                       :min="10"
-                      :max="2000"
+                      :max="10000"
                     />
                   </n-form-item>
                   <n-form-item>
@@ -78,14 +84,14 @@
                 <n-form
                   ref="formRef"
                   :label-width="80"
-                  :model="setData"
                   label-placement="left"
                   size="small"
                 >
-                  <n-form-item label="使用算法" path="algorithmType">
+                  <n-form-item label="使用算法">
                     <n-radio-group
-                      v-model:value="setData.algorithmType"
                       name="radiogroup"
+                      :on-update:value="findPath"
+                      default-value="dfs"
                     >
                       <n-space>
                         <n-radio
@@ -133,10 +139,6 @@ import { DiamondOutline, ApertureSharp } from "@vicons/ionicons5";
 const state = reactive(new initData());
 
 const formRef = ref<FormInst | null>(null);
-const setData = reactive({
-  name: "",
-  algorithmType: "bfs",
-});
 
 const typeArr = [
   {
@@ -154,13 +156,14 @@ const typeArr = [
 ];
 
 const mapData = reactive({
-  rowCount: 20,
-  colCount: 20,
-  obstacleNum: 20,
+  rowCount: 200,
+  colCount: 200,
+  obstacleNum: 10000,
 });
 
 const statisticalData = reactive({
   spendTime: 0,
+  distance: 0,
 });
 
 //生成随机坐标
@@ -205,7 +208,11 @@ const bfs = (
   exit: posType,
   rowCount: number,
   colCount: number
-): { hasRoad: boolean; comeRoute: posType[] } => {
+): {
+  hasRoad: boolean;
+  distance: number;
+  roadArr: Array<Array<boolean>>;
+} => {
   //利用队列来实现bfs
   const queue = new Queue();
   //开始时把入口放入队列并标记为已访问
@@ -215,6 +222,8 @@ const bfs = (
   const comeRoute = new Array(state.rowCount * state.colCount);
   //初始化已搜索过的节点
   let hasSearchArr: Array<Array<boolean>> = [];
+  //距离
+  let distance = 0;
   for (let i = 0; i < rowCount; i++) {
     hasSearchArr[i] = [];
     for (let j = 0; j < colCount; j++) {
@@ -254,9 +263,31 @@ const bfs = (
       comeRoute[item[0] * colCount + item[1]] = [temp[0], temp[1]];
     });
   }
+
+  let roadArr: Array<Array<boolean>> = [];
+  for (let i = 0; i < rowCount; i++) {
+    roadArr[i] = [];
+    for (let j = 0; j < colCount; j++) {
+      roadArr[i][j] = false;
+    }
+  }
+
+  //从终点开始往回找路径并保存
+  let [x, y] = exit;
+  roadArr[x][y] = true;
+
+  while (comeRoute[x * state.colCount + y]) {
+    distance++;
+    let cur_node = comeRoute[x * state.colCount + y];
+    x = cur_node[0];
+    y = cur_node[1];
+    roadArr[x][y] = true;
+  }
+
   return {
     hasRoad,
-    comeRoute,
+    distance,
+    roadArr,
   };
 };
 
@@ -267,7 +298,11 @@ const dfs = (
   exit: posType,
   rowCount: number,
   colCount: number
-): { hasRoad: boolean; comeRoute: posType[] } => {
+): {
+  hasRoad: boolean;
+  distance: number;
+  roadArr: Array<Array<boolean>>;
+} => {
   //利用栈来实现dfs
   const stack = new Stack();
   //开始时把入口入栈并标记为已访问
@@ -275,6 +310,8 @@ const dfs = (
 
   //存放路径  将二维数组地图映射成为一维数组 对应一维数组下标:colCount*x+y
   const comeRoute = new Array(state.rowCount * state.colCount);
+  //距离
+  let distance = 0;
 
   let hasSearchArr: Array<Array<boolean>> = [];
   for (let i = 0; i < rowCount; i++) {
@@ -312,7 +349,27 @@ const dfs = (
       comeRoute[item[0] * colCount + item[1]] = [temp[0], temp[1]];
     });
   }
-  return { hasRoad, comeRoute };
+  let roadArr: Array<Array<boolean>> = [];
+  for (let i = 0; i < rowCount; i++) {
+    roadArr[i] = [];
+    for (let j = 0; j < colCount; j++) {
+      roadArr[i][j] = false;
+    }
+  }
+
+  //从终点开始往回找路径并保存
+  let [x, y] = exit;
+  roadArr[x][y] = true;
+
+  while (comeRoute[x * state.colCount + y]) {
+    distance++;
+    let cur_node = comeRoute[x * state.colCount + y];
+    x = cur_node[0];
+    y = cur_node[1];
+    roadArr[x][y] = true;
+  }
+
+  return { hasRoad, distance, roadArr };
 };
 
 //生成地图
@@ -393,6 +450,49 @@ const reGenerateMap = () => {
   state.exit = exit;
 };
 
+//当切换选择时重新搜索路径
+const findPath = (value: string) => {
+  let start_time = new Date().getTime();
+  let data: {
+    hasRoad: boolean;
+    distance: number;
+    roadArr: boolean[][];
+  } = {
+    hasRoad: false,
+    distance: 0,
+    roadArr: [],
+  };
+  if (value === "bfs") {
+    data = bfs(
+      state.mapArr,
+      state.entrance,
+      state.exit,
+      state.rowCount,
+      state.colCount
+    );
+  } else if (value === "dfs") {
+    data = dfs(
+      state.mapArr,
+      state.entrance,
+      state.exit,
+      state.rowCount,
+      state.colCount
+    );
+  }
+
+  state.roadArr = data.roadArr;
+
+  let end_time = new Date().getTime();
+  statisticalData.spendTime = end_time - start_time;
+  statisticalData.distance = data.distance;
+
+  if (data.hasRoad) {
+    window.$message.success(`找到终点了! 用时:${statisticalData.spendTime} ms`);
+  } else {
+    window.$message.error("没有找到路~");
+  }
+};
+
 onMounted(() => {
   //生成障碍物和出入口
   const { mapArr, roadArr, entrance, exit } = generateMap(
@@ -406,7 +506,11 @@ onMounted(() => {
   state.exit = exit;
 
   let start_time = new Date().getTime();
-  let { hasRoad, comeRoute } = dfs(
+  let {
+    hasRoad,
+    distance,
+    roadArr: roadArray,
+  } = dfs(
     state.mapArr,
     state.entrance,
     state.exit,
@@ -415,18 +519,8 @@ onMounted(() => {
   );
   let end_time = new Date().getTime();
   statisticalData.spendTime = end_time - start_time;
-
-  //从终点开始往回找路径并保存
-
-  let [x, y] = state.exit;
-  state.roadArr[x][y] = true;
-
-  while (comeRoute[x * state.colCount + y]) {
-    let cur_node = comeRoute[x * state.colCount + y];
-    x = cur_node[0];
-    y = cur_node[1];
-    state.roadArr[x][y] = true;
-  }
+  statisticalData.distance = distance;
+  state.roadArr = roadArray;
 
   if (hasRoad) {
     window.$message.success(
