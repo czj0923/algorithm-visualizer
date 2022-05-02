@@ -1,7 +1,8 @@
+import { posType } from "@/types/PathFinding";
 export class Stack {
-  items: number[] = [];
+  items: Array<posType> = [];
   // 添加元素
-  push(element: number) {
+  push(element: posType) {
     this.items.push(element);
   }
   // 弹出栈顶元素

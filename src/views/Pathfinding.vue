@@ -21,16 +21,21 @@
               v-for="(block, index2) in row"
               :key="index2"
             >
-              {{ block === "99" ? "〇" : block === "100" ? "☆" : "" }}
+              <ApertureSharp v-if="block === '99'" />
+              <DiamondOutline v-else-if="block === '100'" />
             </div>
           </div>
         </div>
       </n-gi>
       <n-gi>
+        <n-statistic label="搜索时间">
+          {{ statisticalData.spendTime }}
+          <template #suffix> ms </template>
+        </n-statistic>
         <div class="set-panel">
           <n-grid x-gap="12" :cols="2">
             <n-gi>
-              <n-card title="地图">
+              <n-card title="地图" hoverable>
                 <n-form
                   ref="mapFormRef"
                   :label-width="80"
@@ -69,7 +74,7 @@
               </n-card>
             </n-gi>
             <n-gi>
-              <n-card title="设置">
+              <n-card title="设置" hoverable>
                 <n-form
                   ref="formRef"
                   :label-width="80"
@@ -84,7 +89,7 @@
                     >
                       <n-space>
                         <n-radio
-                          v-for="item in setData.typeArr"
+                          v-for="item in typeArr"
                           :key="item.key"
                           :value="item.key"
                           :disabled="item.key == 'astar'"
@@ -119,36 +124,43 @@ import {
   NCard,
   NGrid,
   NGi,
+  NStatistic,
 } from "naive-ui";
 import { Stack } from "@/utils/stack";
 import { Queue } from "@/utils/queue";
+import { DiamondOutline, ApertureSharp } from "@vicons/ionicons5";
 
 const state = reactive(new initData());
 
 const formRef = ref<FormInst | null>(null);
 const setData = reactive({
   name: "",
-  typeArr: [
-    {
-      name: "广度优先(BFS)",
-      key: "bfs",
-    },
-    {
-      name: "深度优先(DFS)",
-      key: "dfs",
-    },
-    {
-      name: "A*",
-      key: "astar",
-    },
-  ],
   algorithmType: "bfs",
 });
+
+const typeArr = [
+  {
+    name: "广度优先(BFS)",
+    key: "bfs",
+  },
+  {
+    name: "深度优先(DFS)",
+    key: "dfs",
+  },
+  {
+    name: "A*",
+    key: "astar",
+  },
+];
 
 const mapData = reactive({
   rowCount: 20,
   colCount: 20,
   obstacleNum: 20,
+});
+
+const statisticalData = reactive({
+  spendTime: 0,
 });
 
 //生成随机坐标
@@ -187,19 +199,13 @@ function getInnerPos(
 }
 
 //广度优先搜索
-const bfs: (
+const bfs = (
   mapArr: Array<Array<blockType>>,
   entrance: posType,
   exit: posType,
   rowCount: number,
   colCount: number
-) => { hasRoad: boolean; comeRoute: posType[] } = (
-  mapArr,
-  entrance,
-  exit,
-  rowCount,
-  colCount
-) => {
+): { hasRoad: boolean; comeRoute: posType[] } => {
   //利用队列来实现bfs
   const queue = new Queue();
   //开始时把入口放入队列并标记为已访问
@@ -254,6 +260,61 @@ const bfs: (
   };
 };
 
+//深度优先搜索
+const dfs = (
+  mapArr: Array<Array<blockType>>,
+  entrance: posType,
+  exit: posType,
+  rowCount: number,
+  colCount: number
+): { hasRoad: boolean; comeRoute: posType[] } => {
+  //利用栈来实现dfs
+  const stack = new Stack();
+  //开始时把入口入栈并标记为已访问
+  stack.push(entrance);
+
+  //存放路径  将二维数组地图映射成为一维数组 对应一维数组下标:colCount*x+y
+  const comeRoute = new Array(state.rowCount * state.colCount);
+
+  let hasSearchArr: Array<Array<boolean>> = [];
+  for (let i = 0; i < rowCount; i++) {
+    hasSearchArr[i] = [];
+    for (let j = 0; j < colCount; j++) {
+      hasSearchArr[i][j] = false;
+    }
+  }
+  hasSearchArr[entrance[0]][entrance[1]] = true;
+  //标记是否有道路
+  let hasRoad = false;
+
+  while (!stack.isEmpty()) {
+    const temp = stack.pop() as posType;
+    //如果该点是终点 则结束
+    if (temp[0] == exit[0] && temp[1] == exit[1]) {
+      //标记是否有通路
+      hasRoad = true;
+      break;
+    }
+    //查找可以前往的点,并入栈
+    const pos = getInnerPos(
+      mapArr,
+      temp[0],
+      temp[1],
+      rowCount,
+      colCount,
+      hasSearchArr
+    );
+
+    pos.forEach((item) => {
+      //标记为已查询过
+      hasSearchArr[item[0]][item[1]] = true;
+      stack.push(item);
+      comeRoute[item[0] * colCount + item[1]] = [temp[0], temp[1]];
+    });
+  }
+  return { hasRoad, comeRoute };
+};
+
 //生成地图
 const generateMap = (
   rowCount: number,
@@ -279,7 +340,6 @@ const generateMap = (
       roadArr[i][j] = false;
     }
   }
-  console.log(mapArr);
 
   //生成障碍物
   for (let i = 0; i < obstacleNum; i++) {
@@ -346,7 +406,7 @@ onMounted(() => {
   state.exit = exit;
 
   let start_time = new Date().getTime();
-  let { hasRoad, comeRoute } = bfs(
+  let { hasRoad, comeRoute } = dfs(
     state.mapArr,
     state.entrance,
     state.exit,
@@ -354,7 +414,7 @@ onMounted(() => {
     state.colCount
   );
   let end_time = new Date().getTime();
-  const spend_time = end_time - start_time;
+  statisticalData.spendTime = end_time - start_time;
 
   //从终点开始往回找路径并保存
 
@@ -369,7 +429,9 @@ onMounted(() => {
   }
 
   if (hasRoad) {
-    window.$message.success("找到终点了! 用时:" + spend_time + "ms");
+    window.$message.success(
+      "找到终点了! 用时:" + statisticalData.spendTime + "ms"
+    );
   } else {
     window.$message.error("没有找到路~");
   }
@@ -394,9 +456,9 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   font-size: 18px;
-  background-color: #fff;
+  background-color: #d2edff;
   &.obstacle {
-    background-color: rgb(154, 154, 154);
+    background-color: rgb(255, 96, 96);
     color: #fff;
   }
 }

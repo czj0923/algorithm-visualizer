@@ -1,7 +1,8 @@
+import { posType } from "@/types/PathFinding";
 export class Queue {
-  items: Array<Array<number>> = [];
+  items: Array<posType> = [];
   //入队
-  enqueue(element: number[]) {
+  enqueue(element: posType) {
     this.items.push(element);
   }
   //出队
