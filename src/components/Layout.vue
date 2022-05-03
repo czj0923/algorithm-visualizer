@@ -18,11 +18,9 @@
       >
         <n-menu :options="menuOptions" />
       </n-layout-sider>
-      <n-scrollbar>
-        <n-layout-content content-style="padding: 24px;">
-          <router-view />
-        </n-layout-content>
-      </n-scrollbar>
+      <n-layout-content content-style="padding: 24px;">
+        <router-view />
+      </n-layout-content>
     </n-layout>
   </n-layout>
 </template>

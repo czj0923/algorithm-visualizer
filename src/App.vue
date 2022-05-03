@@ -3,17 +3,23 @@
     :theme="store.theme"
     :breakpoints="{ xs: 0, s: 640, m: 1024, l: 1280, xl: 1536, xxl: 1920 }"
   >
-    <n-message-provider :max="2">
-      <MessageApi />
-    </n-message-provider>
+    <n-loading-bar-provider>
+      <n-message-provider :max="2">
+        <ConfigApi />
+      </n-message-provider>
+    </n-loading-bar-provider>
     <Layout />
   </n-config-provider>
 </template>
 
 <script lang="ts" setup>
 import Layout from "@/components/Layout.vue";
-import MessageApi from "@/components/message-api.vue";
-import { NMessageProvider, NConfigProvider } from "naive-ui";
+import ConfigApi from "@/components/config-api.vue";
+import {
+  NMessageProvider,
+  NConfigProvider,
+  NLoadingBarProvider,
+} from "naive-ui";
 import { useMainStore } from "@/store/main";
 
 const store = useMainStore();

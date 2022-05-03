@@ -1,118 +1,141 @@
 <template>
-  <div class="path-finding">
-    <n-grid x-gap="12" cols="xs:1 l:2" responsive="screen">
-      <n-gi>
-        <div class="map">
-          <div
-            class="row"
-            :style="{
-              height: 600 / state.rowCount + 'px',
-            }"
-            v-for="(row, index1) in state.mapArr"
-            :key="index1"
-          >
+  <n-grid :x-gap="12" cols="xs:1 l:2" responsive="screen" class="path-finding">
+    <n-gi>
+      <div class="map-wrapper">
+        <n-spin :show="otherState.loading">
+          <div class="map">
             <div
-              class="block"
-              :class="{ obstacle: block === '2' }"
+              class="row"
               :style="{
-                width: 600 / state.colCount + 'px',
-                backgroundColor: state.roadArr[index1][index2] ? '#0f0' : '',
+                height: 600 / state.rowCount + 'px',
               }"
-              v-for="(block, index2) in row"
-              :key="index2"
+              v-for="(row, index1) in state.mapArr"
+              :key="index1"
             >
-              <ApertureSharp v-if="block === '99'" />
-              <DiamondOutline v-else-if="block === '100'" />
+              <div
+                class="block"
+                :class="{ obstacle: block === '2' }"
+                :style="{
+                  width: 600 / state.colCount + 'px',
+                  backgroundColor: state.roadArr[index1][index2] ? '#0f0' : '',
+                }"
+                v-for="(block, index2) in row"
+                :key="index2"
+              >
+                <ApertureSharp v-if="block === '99'" />
+                <DiamondOutline v-else-if="block === '100'" />
+              </div>
             </div>
           </div>
-        </div>
-      </n-gi>
-      <n-gi>
-        <n-card title="统计信息">
-          <n-statistic label="搜索时间">
-            {{ statisticalData.spendTime }}
-            <template #suffix> ms </template>
-          </n-statistic>
-          <n-statistic label="单位距离">
-            {{ statisticalData.distance }}
-            <template #suffix> 单位 </template>
-          </n-statistic>
-        </n-card>
-        <div class="set-panel">
-          <n-grid x-gap="12" :cols="2">
-            <n-gi>
-              <n-card title="地图" hoverable>
-                <n-form
-                  ref="mapFormRef"
-                  :label-width="80"
-                  :model="mapData"
-                  label-placement="left"
-                  size="small"
-                  ><n-form-item label="行数" path="rowCount">
-                    <n-input-number
-                      v-model:value="mapData.rowCount"
-                      placeholder="最大值"
-                      :min="10"
-                      :max="200"
-                    />
-                  </n-form-item>
-                  <n-form-item label="列数" path="colCount">
-                    <n-input-number
-                      v-model:value="mapData.colCount"
-                      placeholder="最大值"
-                      :min="10"
-                      :max="200"
-                    /> </n-form-item
-                  ><n-form-item label="障碍物数" path="obstacleNum">
-                    <n-input-number
-                      v-model:value="mapData.obstacleNum"
-                      placeholder="最大值"
-                      :min="10"
-                      :max="10000"
-                    />
-                  </n-form-item>
-                  <n-form-item>
-                    <n-button type="primary" @click="reGenerateMap">
-                      重新生成地图
-                    </n-button>
-                  </n-form-item>
-                </n-form>
-              </n-card>
-            </n-gi>
-            <n-gi>
-              <n-card title="设置" hoverable>
-                <n-form
-                  ref="formRef"
-                  :label-width="80"
-                  label-placement="left"
-                  size="small"
+        </n-spin>
+      </div>
+    </n-gi>
+    <n-gi>
+      <n-grid x-gap="12" y-gap="12" :cols="2">
+        <n-gi :span="2">
+          <n-card>
+            <template #header>
+              <n-icon>
+                <InformationCircleOutline />
+              </n-icon>
+              <span>统计信息</span></template
+            >
+            <n-space>
+              <!-- <n-tag type="info"> {{state}} </n-tag> -->
+              <n-statistic label="搜索时间">
+                {{ statisticalData.spendTime }}
+                <template #suffix> ms</template>
+              </n-statistic>
+              <n-statistic label="单位距离">
+                {{ statisticalData.distance }}
+                <template #suffix> 步</template>
+              </n-statistic>
+            </n-space>
+          </n-card>
+        </n-gi>
+        <n-gi>
+          <n-card hoverable>
+            <template #header>
+              <n-icon>
+                <MapOutline />
+              </n-icon>
+              <span>地图</span>
+            </template>
+            <n-form
+              ref="mapFormRef"
+              :label-width="80"
+              :model="mapData"
+              label-placement="left"
+              size="small"
+              ><n-form-item label="行数" path="rowCount">
+                <n-input-number
+                  v-model:value="mapData.rowCount"
+                  placeholder="最大值"
+                  :min="10"
+                  :max="200"
+                />
+              </n-form-item>
+              <n-form-item label="列数" path="colCount">
+                <n-input-number
+                  v-model:value="mapData.colCount"
+                  placeholder="最大值"
+                  :min="10"
+                  :max="200"
+                /> </n-form-item
+              ><n-form-item label="障碍物数" path="obstacleNum">
+                <n-input-number
+                  v-model:value="mapData.obstacleNum"
+                  placeholder="最大值"
+                  :min="10"
+                  :max="10000"
+                />
+              </n-form-item>
+              <n-form-item>
+                <n-button type="primary" @click="reGenerateMap">
+                  重新生成地图
+                </n-button>
+              </n-form-item>
+            </n-form>
+          </n-card>
+        </n-gi>
+        <n-gi>
+          <n-card hoverable>
+            <template #header>
+              <n-icon>
+                <SettingsOutline />
+              </n-icon>
+              <span>设置</span>
+            </template>
+            <n-form
+              ref="formRef"
+              :label-width="80"
+              label-placement="left"
+              size="small"
+            >
+              <n-form-item label="使用算法">
+                <n-radio-group
+                  name="radiogroup"
+                  :on-update:value="findPath"
+                  default-value="dfs"
                 >
-                  <n-form-item label="使用算法">
-                    <n-radio-group
-                      name="radiogroup"
-                      :on-update:value="findPath"
-                      default-value="dfs"
+                  <n-space>
+                    <n-radio
+                      v-for="item in typeArr"
+                      :key="item.key"
+                      :value="item.key"
+                      :disabled="item.key == 'astar'"
                     >
-                      <n-space>
-                        <n-radio
-                          v-for="item in typeArr"
-                          :key="item.key"
-                          :value="item.key"
-                          :disabled="item.key == 'astar'"
-                        >
-                          {{ item.name }}
-                        </n-radio>
-                      </n-space>
-                    </n-radio-group>
-                  </n-form-item>
-                </n-form>
-              </n-card>
-            </n-gi>
-          </n-grid>
-        </div>
-      </n-gi>
-    </n-grid>
-  </div>
+                      {{ item.name }}
+                    </n-radio>
+                  </n-space>
+                </n-radio-group>
+              </n-form-item>
+            </n-form>
+          </n-card>
+        </n-gi>
+      </n-grid>
+    </n-gi>
+  </n-grid>
 </template>
 
 <script lang="ts" setup>
@@ -131,10 +154,18 @@ import {
   NGrid,
   NGi,
   NStatistic,
+  NIcon,
+  NSpin,
 } from "naive-ui";
 import { Stack } from "@/utils/stack";
 import { Queue } from "@/utils/queue";
-import { DiamondOutline, ApertureSharp } from "@vicons/ionicons5";
+import {
+  DiamondOutline,
+  ApertureSharp,
+  SettingsOutline,
+  MapOutline,
+  InformationCircleOutline,
+} from "@vicons/ionicons5";
 
 const state = reactive(new initData());
 
@@ -150,7 +181,7 @@ const typeArr = [
     key: "dfs",
   },
   {
-    name: "A*",
+    name: "A*(AStar)",
     key: "astar",
   },
 ];
@@ -164,6 +195,10 @@ const mapData = reactive({
 const statisticalData = reactive({
   spendTime: 0,
   distance: 0,
+});
+
+const otherState = reactive({
+  loading: false,
 });
 
 //生成随机坐标
@@ -452,6 +487,7 @@ const reGenerateMap = () => {
 
 //当切换选择时重新搜索路径
 const findPath = (value: string) => {
+  window.$loading.start();
   let start_time = new Date().getTime();
   let data: {
     hasRoad: boolean;
@@ -491,6 +527,9 @@ const findPath = (value: string) => {
   } else {
     window.$message.error("没有找到路~");
   }
+  setTimeout(() => {
+    window.$loading.finish();
+  }, 0);
 };
 
 onMounted(() => {
@@ -504,6 +543,11 @@ onMounted(() => {
   state.roadArr = roadArr;
   state.entrance = entrance;
   state.exit = exit;
+
+  let { rowCount, colCount, obstacleNum } = state;
+  mapData.rowCount = rowCount;
+  mapData.colCount = colCount;
+  mapData.obstacleNum = obstacleNum;
 
   let start_time = new Date().getTime();
   let {
@@ -533,8 +577,16 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.n-card > .n-card-header) {
+  .n-card-header__main {
+    display: flex;
+    align-items: center;
+    i {
+      margin-right: 8px;
+    }
+  }
+}
 .path-finding {
-  display: flex;
 }
 .map {
   width: 600px;
