@@ -1,11 +1,6 @@
 <template>
   <div>
-    <div id="main" style="width: 600px; height: 400px"></div>
-    <div v-for="(item, index1) in state.arr" :key="index1">
-      --------------
-      <div v-for="(item2, index2) in item" :key="index2">{{ item2 }}</div>
-    </div>
-    <n-button @click="test">测试</n-button>
+    <div id="main" style="width: 100%; min-height: 500px"></div>
   </div>
 </template>
 
@@ -13,48 +8,71 @@
 import { onMounted, reactive } from "vue";
 import * as echarts from "echarts";
 import { NSpin, NButton } from "naive-ui";
+type EChartsOption = echarts.EChartsOption;
 
-const state: {
-  arr: Array<Array<string>>;
-} = reactive({
-  arr: [],
-});
-for (let i = 0; i < 10; i++) {
-  state.arr[i] = [];
-  for (let j = 0; j < 10; j++) {
-    state.arr[i][j] = "1";
-  }
-}
-
-const test = () => {
-  state.arr[5][5] = "reuteuritei";
-};
 onMounted(() => {
   var myChart = echarts.init(document.getElementById("main") as HTMLElement);
 
-  // 指定图表的配置项和数据
-  var option = {
-    title: {
-      text: "ECharts 入门示例",
-    },
-    tooltip: {},
-    legend: {
-      data: ["销量"],
-    },
+  const data: number[] = [];
+  for (let i = 0; i < 50; ++i) {
+    data.push(Math.round(Math.random() * 200));
+  }
+  let option: EChartsOption = {
     xAxis: {
-      data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+      type: "category",
+      animationDuration: 300,
+      animationDurationUpdate: 300,
+      //max: 4, // only the largest 3 bars will be displayed
     },
-    yAxis: {},
+    yAxis: {
+      max: "dataMax",
+    },
     series: [
       {
-        name: "销量",
+        //realtimeSort: true,
+        name: "X",
         type: "bar",
-        data: [5, 20, 36, 10, 10, 20],
+        data: data,
+        label: {
+          show: true,
+          position: "top",
+          valueAnimation: true,
+        },
       },
     ],
+    legend: {
+      show: true,
+    },
+    animationDuration: 0,
+    animationDurationUpdate: 3000,
+    animationEasing: "linear",
+    animationEasingUpdate: "linear",
   };
+  function run() {
+    for (let i = 0; i < data.length; ++i) {
+      if (Math.random() > 0.9) {
+        data[i] += Math.round(Math.random() * 2000);
+      } else {
+        data[i] += Math.round(Math.random() * 200);
+      }
+    }
+    myChart.setOption({
+      series: [
+        {
+          //type: "bar",
+          data,
+        },
+      ],
+    });
+  }
+  //setTimeout(function () {
+  //  run();
+  //}, 0);
+  //setInterval(function () {
+  //  run();
+  //}, 3000);
 
-  myChart.setOption(option);
+  option && myChart.setOption(option);
 });
 </script>
 <style scoped lang="scss"></style>

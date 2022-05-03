@@ -104,6 +104,9 @@ const menuOptions: MenuOption[] = [
 </script>
 
 <style scoped lang="scss">
+.n-layout {
+  height: 100%;
+}
 .main-layout {
   min-height: 100vh;
   .nav {
