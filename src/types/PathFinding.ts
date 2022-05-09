@@ -10,7 +10,7 @@ export class initData {
   exit: posType = [0, 0]; //出口
 }
 
-//坐标
-export type posType = [number, number];
 //格子 联合类型
 export type blockType = "1" | "2" | "99" | "100";
+//坐标
+export type posType = [number, number];
