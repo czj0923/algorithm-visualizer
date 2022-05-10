@@ -1,24 +1,23 @@
-import { posType } from "@/types/PathFinding";
-export class Stack {
-  items: Array<posType> = [];
+export class Stack<T> {
+  items: T[] = [];
   // 添加元素
-  push(element: posType) {
+  push(element: T) {
     this.items.push(element);
   }
   // 弹出栈顶元素
-  pop() {
+  pop(): T | undefined {
     return this.items.pop();
   }
   //  查看栈顶元素
-  peek() {
+  peek(): T | undefined {
     return this.items[this.items.length - 1];
   }
   // 检查栈是否为空
-  isEmpty() {
+  isEmpty(): boolean {
     return !this.items.length;
   }
   // 栈的大小
-  size() {
+  size(): number {
     return this.items.length;
   }
   // 清空栈
