@@ -1,5 +1,10 @@
-// Fisher–Yates shuffle 洗牌算法
-export const shuffle = (arr: number[]): number[] => {
+/**
+ * Fisher–Yates shuffle 洗牌算法
+ * @param {T[]} arr
+ * @return {T[]}
+ */
+
+export const shuffle = <T>(arr: T[]): T[] => {
   let l = arr.length;
   let index, temp;
   while (l > 0) {
