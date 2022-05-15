@@ -1,6 +1,6 @@
 /**
  * 冒泡排序
- * @param {arr} number[]
+ * @param {number[]} arr
  * @return {number[]}
  */
 
