@@ -1,14 +1,11 @@
 <template>
-  <n-config-provider
-    :theme="store.theme"
-    :breakpoints="{ xs: 0, s: 640, m: 1024, l: 1280, xl: 1536, xxl: 1920 }"
-  >
+  <n-config-provider :theme="store.theme" :theme-overrides="themeOverrides">
     <n-loading-bar-provider>
       <n-message-provider :max="2">
         <ConfigApi />
       </n-message-provider>
     </n-loading-bar-provider>
-    <Layout />
+    <router-view></router-view>
   </n-config-provider>
 </template>
 
@@ -19,8 +16,15 @@ import {
   NMessageProvider,
   NConfigProvider,
   NLoadingBarProvider,
+  GlobalThemeOverrides,
 } from "naive-ui";
 import { useMainStore } from "@/store/main";
+
+const themeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: "#2d8cf0",
+  },
+};
 
 const store = useMainStore();
 </script>

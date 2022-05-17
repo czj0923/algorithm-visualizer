@@ -14,5 +14,6 @@ export const shuffle = <T>(arr: T[]): T[] => {
     arr[index] = temp;
     l--;
   }
+
   return arr;
 };

@@ -8,15 +8,25 @@
         </n-button>
       </n-space>
     </n-layout-header>
-    <n-layout has-sider>
+    <n-layout has-sider class="content-layout">
       <n-layout-sider
-        collapse-mode="width"
-        :collapsed-width="13"
-        :width="240"
+        width="200"
         show-trigger="arrow-circle"
         bordered
+        @collapse="collapsed = true"
+        @expand="collapsed = false"
+        :collapsed="collapsed"
+        collapse-mode="width"
+        :collapsed-width="64"
       >
-        <n-menu :options="menuOptions" />
+        <NMenu
+          :options="menuOptions"
+          :collapsed="collapsed"
+          :collapsed-width="64"
+          :collapsed-icon-size="20"
+          @update:value="handleUpdateValue"
+          :value="selectedKeys"
+        />
       </n-layout-sider>
       <n-layout-content content-style="padding: 24px;">
         <router-view />
@@ -26,8 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { h, Component } from "vue";
-import { NScrollbar, NSpace } from "naive-ui";
+import { h, Component, ref } from "vue";
 import {
   NMenu,
   NLayout,
@@ -36,6 +45,7 @@ import {
   NLayoutHeader,
   NButton,
   darkTheme,
+  NSpace,
   NIcon,
 } from "naive-ui";
 import type { MenuOption } from "naive-ui";
@@ -45,12 +55,23 @@ import {
   BarChartOutline,
   HomeOutline,
   CompassOutline,
+  PricetagsOutline,
 } from "@vicons/ionicons5";
+import router from "@/router";
 
 const store = useMainStore();
 
+const collapsed = ref<boolean>(false);
+
 const changeTheme = () => {
   store.theme = store.theme ? null : darkTheme;
+};
+
+const selectedKeys = ref<string>(localStorage.getItem("route") as string);
+
+const handleUpdateValue = (key: string, item: MenuOption) => {
+  selectedKeys.value = item.key as string;
+  localStorage.setItem("route", item.key as string);
 };
 
 function renderIcon(icon: Component) {
@@ -64,12 +85,12 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            path: "/",
+            path: "/home",
           },
         },
         { default: () => "首页" }
       ),
-    key: "astar",
+    key: "home",
     icon: renderIcon(HomeOutline),
   },
   {
@@ -83,7 +104,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "寻路算法" }
       ),
-    key: "2",
+    key: "pathfinding",
     icon: renderIcon(CompassOutline),
   },
   {
@@ -92,23 +113,51 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            path: "/echarts",
+            path: "/sort",
           },
         },
-        { default: () => "echarts" }
+        { default: () => "排序算法" }
       ),
-    key: "3",
+    key: "sort",
     icon: renderIcon(BarChartOutline),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            path: "/test",
+          },
+        },
+        { default: () => "测试" }
+      ),
+    key: "test",
+    icon: renderIcon(PricetagsOutline),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            path: "/canvas",
+          },
+        },
+        { default: () => "canvasMap" }
+      ),
+    key: "canvas",
+    icon: renderIcon(PricetagsOutline),
   },
 ];
 </script>
 
 <style scoped lang="scss">
-.n-layout {
-  height: 100%;
+.content-layout {
+  height: calc(100vh - 61px);
 }
 .main-layout {
-  min-height: 100vh;
+  height: 100vh;
   .nav {
     padding: 10px 20px;
     font-size: 24px;
