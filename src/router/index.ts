@@ -23,10 +23,15 @@ const routes: Array<RouteRecordRaw> = [
           ),
       },
       {
-        path: "sort",
-        name: "sort",
+        path: "bubble",
+        name: "bubble",
+        meta: {
+          title: "冒泡排序",
+        },
         component: () =>
-          import(/* webpackChunkName: "sort" */ "../views/Sort.vue"),
+          import(
+            /* webpackChunkName: "BubbleSort" */ "../views/sort/BubbleSort.vue"
+          ),
       },
       {
         path: "test",

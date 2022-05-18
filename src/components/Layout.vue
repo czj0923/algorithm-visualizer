@@ -108,18 +108,24 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(CompassOutline),
   },
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            path: "/sort",
-          },
-        },
-        { default: () => "排序算法" }
-      ),
+    label: "排序算法",
     key: "sort",
     icon: renderIcon(BarChartOutline),
+    children: [
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: "/bubble",
+              },
+            },
+            { default: () => "冒泡排序" }
+          ),
+        key: "bubble",
+      },
+    ],
   },
   {
     label: () =>
