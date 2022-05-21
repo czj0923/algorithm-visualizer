@@ -23,16 +23,47 @@ const routes: Array<RouteRecordRaw> = [
           ),
       },
       {
-        path: "bubble",
-        name: "bubble",
-        meta: {
-          title: "冒泡排序",
-        },
+        path: "sort",
+        name: "sort",
         component: () =>
-          import(
-            /* webpackChunkName: "BubbleSort" */ "../views/sort/BubbleSort.vue"
-          ),
+          import(/* webpackChunkName: "sort" */ "../views/sort/Index.vue"),
+        children: [
+          {
+            path: "bubble",
+            name: "bubble",
+            meta: {
+              title: "冒泡排序",
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "bubble" */ "../views/sort/BubbleSort.vue"
+              ),
+          },
+          {
+            path: "selection",
+            name: "selection",
+            meta: {
+              title: "选择排序",
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "selection" */ "../views/sort/SelectionSort.vue"
+              ),
+          },
+          {
+            path: "insertion",
+            name: "insertion",
+            meta: {
+              title: "插入排序",
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "insertion" */ "../views/sort/InsertionSort.vue"
+              ),
+          },
+        ],
       },
+
       {
         path: "test",
         name: "test",

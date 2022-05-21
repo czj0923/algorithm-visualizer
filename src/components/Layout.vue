@@ -118,12 +118,38 @@ const menuOptions: MenuOption[] = [
             RouterLink,
             {
               to: {
-                path: "/bubble",
+                path: "/sort/bubble",
               },
             },
             { default: () => "冒泡排序" }
           ),
         key: "bubble",
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: "/sort/selection",
+              },
+            },
+            { default: () => "选择排序" }
+          ),
+        key: "selection",
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: "/sort/insertion",
+              },
+            },
+            { default: () => "插入排序" }
+          ),
+        key: "insertion",
       },
     ],
   },
