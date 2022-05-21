@@ -1,53 +1,48 @@
 /**
  * 冒泡排序
  * @param {ISortItem[]} arr
- * @param {number} delay
- * @return {number[]}
+ * @return {IInfo[]}
  */
-import { ISortItem } from "@/types/Sort";
+import { ISortItem, IInfo } from "@/types/sort";
 
-const bubbleSort = (arr: ISortItem[], delay = 700): ISortItem[] => {
+const bubbleSort = (arr: ISortItem[]): IInfo[] => {
   const l = arr.length;
-  let temp,
-    i = 0,
-    j = 0;
+  let temp;
+  const infoArr: IInfo[] = [
+    {
+      arr: JSON.parse(JSON.stringify(arr)),
+      desc: "",
+    },
+  ];
 
-  //内层循环
-  const innerLoop = () => {
-    if (j >= l - 1 - i) {
-      arr[j].status = 2;
-      j = 0;
-      i++;
-      outLoop();
-      return false;
-    }
-    arr[j].status = 1;
-    arr[j + 1].status = 1;
-    setTimeout(() => {
+  for (let i = 0; i < l - 1; i++) {
+    for (let j = 0; j < l - i - 1; j++) {
       if (arr[j].value > arr[j + 1].value) {
         temp = arr[j];
         arr[j] = arr[j + 1];
         arr[j + 1] = temp;
       }
-      setTimeout(() => {
-        arr[j].status = 0;
-        arr[j + 1].status = 0;
-        j++;
-        innerLoop();
-      }, delay);
-    }, 300);
-  };
+      if (i >= l - 2) {
+        arr[j].status = 2;
+        arr[j + 1].status = 2;
+      } else {
+        arr[j].status = 1;
+        arr[j + 1].status = 1;
+      }
 
-  //外层循环
-  const outLoop = () => {
-    if (i > l) {
-      return false;
+      const obj: IInfo = {
+        arr: JSON.parse(JSON.stringify(arr)),
+        desc: `${i},${j}`,
+      };
+      infoArr.push(obj);
+      arr[j].status = 0;
+      arr[j + 1].status = 0;
+      if (j >= l - i - 2) {
+        arr[j + 1].status = 2;
+      }
     }
-    innerLoop();
-  };
-
-  outLoop();
-  return arr;
+  }
+  return infoArr;
 };
 
 export default bubbleSort;
