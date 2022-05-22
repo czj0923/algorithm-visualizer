@@ -22,7 +22,7 @@ import { useMainStore } from "@/store/main";
 
 const themeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: "#2d8cf0",
+    primaryColor: "#e66b1a",
   },
 };
 

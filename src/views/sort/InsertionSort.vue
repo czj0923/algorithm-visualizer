@@ -118,7 +118,7 @@ onMounted(() => {
     }
     state.curStep = (state.sortInfo as IInfo[])[unref(step)];
     step.value++;
-  }, 1500);
+  }, store.delay);
 });
 </script>
 <style scoped lang="scss"></style>
