@@ -1,16 +1,31 @@
 <template>
   <div class="tool-panel">
-    <n-button type="warning" @click="reset"> 重置 </n-button>
-    <n-button type="success" @click="prevStep" :disabled="step === 1">
-      上一步
-    </n-button>
-    <n-button
-      type="success"
-      @click="nextStep"
-      :disabled="step === store.stepCount"
-    >
-      下一步
-    </n-button>
+    <n-button type="warning" @click="reset" strong> 重置 </n-button>
+    <n-button-group>
+      <n-button type="success" round @click="prevStep" :disabled="step === 1">
+        <template #icon>
+          <n-icon>
+            <ArrowBack />
+          </n-icon>
+        </template>
+        上一步
+      </n-button>
+      <n-button
+        type="success"
+        @click="nextStep"
+        :disabled="step === store.stepCount"
+        icon-placement="right"
+        round
+      >
+        <template #icon>
+          <n-icon>
+            <ArrowForward />
+          </n-icon>
+        </template>
+        下一步
+      </n-button>
+    </n-button-group>
+
     <n-slider :min="1" :max="store.stepCount" v-model:value="step" />
     <div class="info-panel">
       <div>
@@ -29,10 +44,10 @@
 
 <script lang="ts" setup>
 import { unref, ref, watch } from "vue";
-import { NButton, NSlider } from "naive-ui";
+import { NButton, NSlider, NIcon, NButtonGroup } from "naive-ui";
 import { useSortStore } from "@/store/sort";
-import { IInfo } from "@/types/sort";
 import { useRoute } from "vue-router";
+import { ArrowBack, ArrowForward } from "@vicons/ionicons5";
 
 const store = useSortStore();
 const route = useRoute();
@@ -53,8 +68,8 @@ watch(step, (newValue) => {
 
 //重置
 const reset = () => {
-  step.value = 0;
-  store.curStep = store.sortInfo[0];
+  //step.value = 0;
+  //store.curStep = store.sortInfo[0];
 };
 //下一步
 const nextStep = () => {
