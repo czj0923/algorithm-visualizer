@@ -47,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
             },
             component: () =>
               import(
-                /* webpackChunkName: "selection" */ "../views/sort/SelectionSort.vue"
+                /* webpackChunkName: "selection" */ "../views/sort/SelectSort.vue"
               ),
           },
           {
