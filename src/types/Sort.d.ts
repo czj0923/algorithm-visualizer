@@ -10,8 +10,5 @@ export interface IInfo {
 }
 
 export interface IState {
-  length: number; //排序的数组长度
   arr: ISortItem[]; //需要排序的数组
-  sortInfo: IInfo[]; //存放排序的信息
-  curStep: IInfo;
 }

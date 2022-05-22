@@ -33,6 +33,7 @@ const routes: Array<RouteRecordRaw> = [
             name: "bubble",
             meta: {
               title: "冒泡排序",
+              type: "sort",
             },
             component: () =>
               import(
@@ -44,6 +45,7 @@ const routes: Array<RouteRecordRaw> = [
             name: "selection",
             meta: {
               title: "选择排序",
+              type: "sort",
             },
             component: () =>
               import(
@@ -55,6 +57,7 @@ const routes: Array<RouteRecordRaw> = [
             name: "insertion",
             meta: {
               title: "插入排序",
+              type: "sort",
             },
             component: () =>
               import(

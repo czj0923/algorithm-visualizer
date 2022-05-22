@@ -57,7 +57,6 @@ import {
   CompassOutline,
   PricetagsOutline,
 } from "@vicons/ionicons5";
-import router from "@/router";
 
 const store = useMainStore();
 

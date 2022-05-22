@@ -1,32 +1,21 @@
 <template>
-  <n-grid
-    x-gap="12"
-    y-gap="12"
-    cols="xs:1 l:2"
-    responsive="screen"
-    class="sort-page"
-  >
-    <n-gi>
-      <div class="panel">
-        <transition-group name="flip-list">
-          <div
-            class="bar"
-            :class="{
-              switch: item.status == 1,
-              finish: item.status == 2,
-              min: item.status == 3,
-            }"
-            v-for="item in store.curStep.arr"
-            :key="item.value"
-            :style="{ height: (450 / store.length) * item.value + 'px' }"
-          >
-            <span class="num">{{ item.value }}</span>
-          </div>
-        </transition-group>
+  <div class="panel">
+    <transition-group name="flip-list">
+      <div
+        class="bar"
+        :class="{
+          switch: item.status == 1,
+          finish: item.status == 2,
+          min: item.status == 3,
+        }"
+        v-for="item in store.curStep.arr"
+        :key="item.value"
+        :style="{ height: (450 / store.length) * item.value + 'px' }"
+      >
+        <span class="num">{{ item.value }}</span>
       </div>
-    </n-gi>
-    <n-gi><OperationArea /> </n-gi>
-  </n-grid>
+    </transition-group>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -34,8 +23,6 @@ import { onMounted, reactive } from "vue";
 import { shuffle } from "@/utils/shuffle";
 import { selectionSort } from "@/utils/SortingAlgorithm";
 import { IState, ISortItem, IInfo } from "@/types/sort";
-import { NGrid, NGi } from "naive-ui";
-import OperationArea from "./OperationArea.vue";
 import { useSortStore } from "@/store/sort";
 
 const state: IState = reactive({

@@ -28,6 +28,7 @@ const bubbleSort = (arr: ISortItem[]): IInfo[] => {
       });
       arr[j].status = 0;
       cur.status = 0;
+
       temp = arr[j];
       arr[j] = arr[j + 1];
       arr[j + 1] = temp;

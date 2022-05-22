@@ -9,31 +9,31 @@
     <n-gi>
       <router-view></router-view>
     </n-gi>
-    <n-gi>
-      <div class="tool-panel">
-        <n-button type="warning"> 重置 </n-button>
-      </div>
-    </n-gi>
+    <n-gi><OperationArea /> </n-gi>
   </n-grid>
 </template>
 
 <script lang="ts" setup>
-import { NButton, NGrid, NGi } from "naive-ui";
+import { NGrid, NGi } from "naive-ui";
+import OperationArea from "./OperationArea.vue";
 </script>
 <style lang="scss">
 .sort-page {
   height: 500px;
   .tool-panel {
+    .cur {
+      color: #f00;
+    }
   }
   .flip-list-move {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease 0.3s;
   }
   .panel {
     display: flex;
     align-items: flex-end;
     height: 100%;
     padding: 0 10px;
-    background-color: rgb(211, 211, 211);
+    background-color: rgb(255, 237, 209);
   }
   .bar {
     height: 450px;
