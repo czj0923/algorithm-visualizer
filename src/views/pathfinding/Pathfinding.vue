@@ -142,24 +142,7 @@ import dfs from "./js/dfs";
 import { getRandom } from "./js/index";
 import DomMap from "./DomMap.vue";
 import CanvasMap from "./CanvasMap.vue";
-import {
-  NButton,
-  FormInst,
-  NForm,
-  NFormItem,
-  NInputNumber,
-  NRadioGroup,
-  NSpace,
-  NRadio,
-  NCard,
-  NGrid,
-  NGi,
-  NStatistic,
-  NIcon,
-  NSpin,
-  NTabs,
-  NTabPane,
-} from "naive-ui";
+import { FormInst } from "naive-ui";
 
 import {
   SettingsOutline,

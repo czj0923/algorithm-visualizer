@@ -10,14 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import Layout from "@/components/Layout.vue";
 import ConfigApi from "@/components/config-api.vue";
-import {
-  NMessageProvider,
-  NConfigProvider,
-  NLoadingBarProvider,
-  GlobalThemeOverrides,
-} from "naive-ui";
+import { GlobalThemeOverrides } from "naive-ui";
 import { useMainStore } from "@/store/main";
 
 const themeOverrides: GlobalThemeOverrides = {

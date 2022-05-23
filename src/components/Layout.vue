@@ -37,18 +37,8 @@
 
 <script lang="ts" setup>
 import { h, Component, ref } from "vue";
-import {
-  NMenu,
-  NLayout,
-  NLayoutSider,
-  NLayoutContent,
-  NLayoutHeader,
-  NButton,
-  darkTheme,
-  NSpace,
-  NIcon,
-} from "naive-ui";
 import type { MenuOption } from "naive-ui";
+import { darkTheme, NIcon } from "naive-ui";
 import { RouterLink } from "vue-router";
 import { useMainStore } from "@/store/main";
 import {

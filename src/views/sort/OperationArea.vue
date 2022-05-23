@@ -30,13 +30,6 @@
     <div class="info-panel">
       <div>
         {{ store.curStep.desc }}
-        <!-- <span
-              v-for="(item, index) in state.sortInfo"
-              :key="index"
-              :class="{ cur: index === step - 1 }"
-            >
-              {{ item.desc }}
-            </span> -->
       </div>
     </div>
   </div>
@@ -44,7 +37,6 @@
 
 <script lang="ts" setup>
 import { unref, ref, watch } from "vue";
-import { NButton, NSlider, NIcon, NButtonGroup } from "naive-ui";
 import { useSortStore } from "@/store/sort";
 import { useRoute } from "vue-router";
 import { ArrowBack, ArrowForward } from "@vicons/ionicons5";
@@ -68,8 +60,8 @@ watch(step, (newValue) => {
 
 //重置
 const reset = () => {
-  //step.value = 0;
-  //store.curStep = store.sortInfo[0];
+  step.value = 1;
+  store.curStep = store.sortInfo[unref(step) - 1];
 };
 //下一步
 const nextStep = () => {

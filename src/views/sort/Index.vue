@@ -14,7 +14,6 @@
 </template>
 
 <script lang="ts" setup>
-import { NGrid, NGi } from "naive-ui";
 import OperationArea from "./OperationArea.vue";
 </script>
 <style lang="scss">
@@ -34,6 +33,12 @@ import OperationArea from "./OperationArea.vue";
     height: 100%;
     padding: 0 10px;
     background-color: rgb(255, 237, 209);
+    position: relative;
+    .n-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
   }
   .bar {
     height: 450px;

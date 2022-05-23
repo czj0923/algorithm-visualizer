@@ -12,7 +12,6 @@
 
 <script lang="ts" setup>
 import { useRouter } from "vue-router";
-import { NButton } from "naive-ui";
 const router = useRouter();
 function goHome() {
   router.push("/");
