@@ -46,6 +46,7 @@ import {
   HomeOutline,
   CompassOutline,
   PricetagsOutline,
+  AlertCircleOutline,
 } from "@vicons/ionicons5";
 
 const store = useMainStore();
@@ -162,13 +163,13 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            path: "/canvas",
+            path: "/about",
           },
         },
-        { default: () => "canvasMap" }
+        { default: () => "关于" }
       ),
-    key: "canvas",
-    icon: renderIcon(PricetagsOutline),
+    key: "about",
+    icon: renderIcon(AlertCircleOutline),
   },
 ];
 </script>

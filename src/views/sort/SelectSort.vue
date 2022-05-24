@@ -20,31 +20,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from "vue";
-import { shuffle } from "@/utils/shuffle";
+import { onMounted } from "vue";
 import { selectionSort } from "@/utils/SortingAlgorithm";
-import { IState, ISortItem, IInfo } from "@/types/sort";
+import { IInfo } from "@/types/sort";
 import { useSortStore } from "@/store/sort";
 import { useRoute } from "vue-router";
-
-const state: IState = reactive({
-  arr: [],
-});
 
 const store = useSortStore();
 const route = useRoute();
 
 onMounted(() => {
-  for (let i = 1; i <= store.length; i++) {
-    let obj: ISortItem = {
-      value: i,
-      status: 0,
-    };
-    state.arr.push(obj);
-  }
-  shuffle(state.arr);
-
-  let info = selectionSort(state.arr);
+  let info = selectionSort(JSON.parse(JSON.stringify(store.arr)));
   store.sortInfo = info;
   store.stepCount = info.length;
   store.curStep = (store.sortInfo as IInfo[])[0];

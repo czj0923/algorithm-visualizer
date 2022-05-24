@@ -1,5 +1,6 @@
 <template>
   <div class="panel">
+    <n-tag type="error" size="large"> {{ route.meta.title }} </n-tag>
     <transition-group name="flip-list">
       <div
         class="bar"
@@ -15,29 +16,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from "vue";
-import { shuffle } from "@/utils/shuffle";
+import { onMounted } from "vue";
 import { insertionSort } from "@/utils/SortingAlgorithm";
-import { IState, ISortItem, IInfo } from "@/types/sort";
+import { IInfo } from "@/types/sort";
 import { useSortStore } from "@/store/sort";
+import { useRoute } from "vue-router";
 
 const store = useSortStore();
-
-const state: IState = reactive({
-  arr: [],
-});
+const route = useRoute();
 
 onMounted(() => {
-  for (let i = 1; i <= store.length; i++) {
-    let obj: ISortItem = {
-      value: i,
-      status: 0,
-    };
-    state.arr.push(obj);
-  }
-  shuffle(state.arr);
-
-  let info = insertionSort(state.arr);
+  let info = insertionSort(JSON.parse(JSON.stringify(store.arr)));
   store.sortInfo = info;
   store.stepCount = info.length;
   store.curStep = (store.sortInfo as IInfo[])[0];

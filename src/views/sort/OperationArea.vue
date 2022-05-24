@@ -1,6 +1,12 @@
 <template>
   <div class="tool-panel">
-    <n-button type="warning" @click="reset" strong> 重置 </n-button>
+    <n-button type="warning" @click="reset" strong>
+      <template #icon>
+        <n-icon>
+          <Refresh />
+        </n-icon> </template
+      >重置
+    </n-button>
     <n-button-group>
       <n-button type="success" round @click="prevStep" :disabled="step === 1">
         <template #icon>
@@ -39,7 +45,9 @@
 import { unref, ref, watch } from "vue";
 import { useSortStore } from "@/store/sort";
 import { useRoute } from "vue-router";
-import { ArrowBack, ArrowForward } from "@vicons/ionicons5";
+import { shuffle } from "@/utils/shuffle";
+import { ISortItem } from "@/types/sort";
+import { ArrowBack, ArrowForward, Refresh } from "@vicons/ionicons5";
 
 const store = useSortStore();
 const route = useRoute();
@@ -62,6 +70,7 @@ watch(step, (newValue) => {
 const reset = () => {
   step.value = 1;
   store.curStep = store.sortInfo[unref(step) - 1];
+  window.$message.success("重置成功");
 };
 //下一步
 const nextStep = () => {
@@ -79,6 +88,15 @@ const prevStep = () => {
     store.curStep = store.sortInfo[unref(step) - 1];
   }
 };
+
+for (let i = 1; i <= store.length; i++) {
+  let obj: ISortItem = {
+    value: i,
+    status: 0,
+  };
+  store.arr.push(obj);
+}
+shuffle(store.arr);
 
 //信息数组的长度
 //const len = state.sortInfo.length;

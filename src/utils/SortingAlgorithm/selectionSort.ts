@@ -10,7 +10,7 @@ const selectionSort = (arr: ISortItem[]): IInfo[] => {
   const infoArr: IInfo[] = [
     {
       arr: JSON.parse(JSON.stringify(arr)),
-      desc: "选择排序",
+      desc: "开始",
     },
   ];
   let minIndex = 0,
@@ -64,7 +64,7 @@ const selectionSort = (arr: ISortItem[]): IInfo[] => {
       arr[i + 1].status = 2;
       infoArr.push({
         arr: JSON.parse(JSON.stringify(arr)),
-        desc: `排序结束`,
+        desc: `排序完成`,
       });
     } else {
       infoArr.push({

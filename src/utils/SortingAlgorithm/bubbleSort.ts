@@ -46,11 +46,15 @@ const bubbleSort = (arr: ISortItem[]): IInfo[] => {
       });
       arr[j].status = 0;
       arr[j + 1].status = 0;
-      if (j >= l - i - 2) {
-        arr[j + 1].status = 2;
-      }
     }
+    arr[l - i - 1].status = 2;
   }
+  arr[0].status = 2;
+  infoArr.push({
+    arr: JSON.parse(JSON.stringify(arr)),
+    desc: `排序完成`,
+  });
+
   return infoArr;
 };
 

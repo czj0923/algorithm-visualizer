@@ -74,12 +74,10 @@ const routes: Array<RouteRecordRaw> = [
           import(/* webpackChunkName: "Test" */ "../views/Test.vue"),
       },
       {
-        path: "canvas",
-        name: "canvas",
+        path: "about",
+        name: "about",
         component: () =>
-          import(
-            /* webpackChunkName: "Test" */ "../views/pathfinding/CanvasMap.vue"
-          ),
+          import(/* webpackChunkName: "about" */ "../views/about/index.vue"),
       },
       {
         path: "/:pathMatch(.*)",

@@ -8,7 +8,3 @@ export interface IInfo {
   arr: ISortItem[];
   desc: string;
 }
-
-export interface IState {
-  arr: ISortItem[]; //需要排序的数组
-}
