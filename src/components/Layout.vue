@@ -3,8 +3,11 @@
     <n-layout-header bordered class="nav">
       <n-space justify="space-between" align="center">
         <span>算法与数据结构可视化</span>
-        <n-button quaternary type="success" @click="changeTheme">
-          {{ store.theme ? "浅色" : "深色" }}
+        <n-button text style="font-size: 24px" @click="changeTheme">
+          <n-icon>
+            <MoonOutline v-if="store.theme" />
+            <SunnyOutline v-else />
+          </n-icon>
         </n-button>
       </n-space>
     </n-layout-header>
@@ -47,6 +50,8 @@ import {
   CompassOutline,
   PricetagsOutline,
   AlertCircleOutline,
+  SunnyOutline,
+  MoonOutline,
 } from "@vicons/ionicons5";
 
 const store = useMainStore();
@@ -140,6 +145,19 @@ const menuOptions: MenuOption[] = [
             { default: () => "插入排序" }
           ),
         key: "insertion",
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: "/sort/counting",
+              },
+            },
+            { default: () => "计数排序" }
+          ),
+        key: "counting",
       },
     ],
   },

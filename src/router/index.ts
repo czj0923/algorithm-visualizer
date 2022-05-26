@@ -64,6 +64,18 @@ const routes: Array<RouteRecordRaw> = [
                 /* webpackChunkName: "insertion" */ "../views/sort/InsertionSort.vue"
               ),
           },
+          {
+            path: "counting",
+            name: "counting",
+            meta: {
+              title: "计数排序",
+              type: "sort",
+            },
+            component: () =>
+              import(
+                /* webpackChunkName: "counting" */ "../views/sort/CountingSort.vue"
+              ),
+          },
         ],
       },
 

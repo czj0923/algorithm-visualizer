@@ -7,4 +7,5 @@ export interface ISortItem {
 export interface IInfo {
   arr: ISortItem[];
   desc: string;
+  countArr?: number[]; //计数排序用到
 }

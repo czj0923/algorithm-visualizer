@@ -26,6 +26,8 @@ export const useSortStore = defineStore("sort", {
       stepCount: 0, //总步数
     };
   },
-  getters: {},
+  getters: {
+    countArr: (state) => state.curStep.countArr?.slice(1),
+  },
   actions: {},
 });

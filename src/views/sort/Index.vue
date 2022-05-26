@@ -28,8 +28,6 @@ import OperationArea from "./OperationArea.vue";
     transition: transform 0.3s ease 0.3s;
   }
   .panel {
-    display: flex;
-    align-items: flex-end;
     height: 100%;
     padding: 0 10px;
     background-color: rgb(255, 237, 209);
@@ -38,6 +36,13 @@ import OperationArea from "./OperationArea.vue";
       position: absolute;
       top: 10px;
       left: 10px;
+    }
+    .bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      position: absolute;
+      width: calc(100% - 20px);
+      bottom: 0;
     }
   }
   .bar {

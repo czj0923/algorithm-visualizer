@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { unref, ref, watch } from "vue";
+import { unref, ref, watch, onUnmounted } from "vue";
 import { useSortStore } from "@/store/sort";
 import { useRoute } from "vue-router";
 import { shuffle } from "@/utils/shuffle";
@@ -108,5 +108,10 @@ shuffle(store.arr);
 //  state.curStep = state.sortInfo[unref(step)];
 //  step.value++;
 //}, store.delay);
+
+//操作区组件卸载时重置store
+onUnmounted(() => {
+  store.$reset();
+});
 </script>
 <style lang="scss" scoped></style>

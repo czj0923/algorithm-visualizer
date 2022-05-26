@@ -1,7 +1,7 @@
 <template>
   <div class="panel">
     <n-tag type="error" size="large"> {{ route.meta.title }} </n-tag>
-    <transition-group name="flip-list">
+    <transition-group name="flip-list" tag="div" class="bar-wrap">
       <div
         class="bar"
         :class="{
